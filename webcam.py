@@ -3,8 +3,11 @@ import numpy as np
 import cv2
 from ultralytics import YOLO
 
+
+WEIGHTS = 'yolov8m'
+
 # load yolov8 model
-model = YOLO('yolov8m.pt')
+model = YOLO(f'weights/{WEIGHTS}.pt')
 
 ret, cap = True, cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
