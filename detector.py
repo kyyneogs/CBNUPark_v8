@@ -5,12 +5,12 @@ from time import time
 from ultralytics import YOLO
 
 
-class ObjectDetection:
+class ObjectDetector:
 
-    def __init__(self, capture_index):
+    def __init__(self, model_name):
         # object detector init
-
-        self.capture_index = capture_index
+        
+        self.model_name = model_name
 
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         print('Selected Device: ', self.device)
@@ -20,7 +20,7 @@ class ObjectDetection:
 
     def load_model(self):
 
-        model = YOLO('weights/yolov8n.pt')
+        model = YOLO(f'weights/{self.model_name}.pt')
         model.fuse()
 
         return model
@@ -31,19 +31,20 @@ class ObjectDetection:
 
         return results
     
-    def plot_bboxes(self, results, frame):
-
-        xyxys = []
-        confidences = []
-        class_ids = []
+    def plot_bboxes(self, results, frame, classes=None):
 
         # Extract detections
         for result in results:
             boxes = result.boxes.cpu().numpy()
 
-            xyxy = boxes.xyxy
-            xywh = boxes.xywh
+            class_ids = boxes.cls
+            confs = boxes.conf
+            xyxys = boxes.xyxy
 
-            print(boxes)
+            for idx in range(len(class_ids)):
+                if class_ids[idx] in classes:
+                    xyxy = xyxys[idx]
+                    cv2.rectangle(frame,(int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])),\
+                                        (0,255,0), thickness=1, lineType=cv2.LINE_AA)
         
-        return frame
+        # None return
